@@ -42,6 +42,8 @@ CREATE TABLE CardLogs (
     GateNumber TINYINT NOT NULL
 );
 
+
+
 CREATE TABLE DailyAttendance (
     RecordID BIGINT IDENTITY(1,1) PRIMARY KEY,
     PersonelID INT NOT NULL FOREIGN KEY REFERENCES Personel(PersonelID),
