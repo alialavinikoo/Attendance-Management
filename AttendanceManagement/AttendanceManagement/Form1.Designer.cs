@@ -28,12 +28,34 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
+            btnImport = new Button();
+            SuspendLayout();
+            // 
+            // btnImport
+            // 
+            btnImport.Font = new Font("Segoe UI", 11F);
+            btnImport.Location = new Point(294, 263);
+            btnImport.Name = "btnImport";
+            btnImport.Size = new Size(206, 99);
+            btnImport.TabIndex = 0;
+            btnImport.Text = "Attendance File Import";
+            btnImport.UseVisualStyleBackColor = true;
+            btnImport.Click += btnImport_Click;
+            // 
+            // Form1
+            // 
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
-            Text = "Form1";
+            ClientSize = new Size(800, 425);
+            Controls.Add(btnImport);
+            Name = "Form1";
+            Text = "Attendance Management System";
+            Load += Form1_Load;
+            ResumeLayout(false);
         }
 
         #endregion
+
+        private Button btnImport;
     }
 }

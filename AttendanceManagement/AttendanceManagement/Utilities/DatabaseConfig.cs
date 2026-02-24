@@ -6,7 +6,7 @@ namespace AttendanceManagement.Utilities
     {
         public static string GetConnectionString()
         {
-            return ConfigurationManager.ConnectionStrings["DefualtConnection"].ConnectionString;
+            return ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
         }
     }
 }
