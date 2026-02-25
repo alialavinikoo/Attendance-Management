@@ -43,14 +43,16 @@ CREATE TABLE CardLogs (
 );
 
 
-
 CREATE TABLE DailyAttendance (
     RecordID BIGINT IDENTITY(1,1) PRIMARY KEY,
     PersonelID INT NOT NULL FOREIGN KEY REFERENCES Personel(PersonelID),
     WorkDate DATE NOT NULL,
     FirstInTime TIME(0),
     LastOutTime TIME(0),
-    LateMinutes INT DEFAULT 0 CHECK (LateMinutes >= 0),
-    OvertimeMinutes INT DEFAULT 0 CHECK (LateMinutes >= 0),
+    ArrivalLateMinutes INT DEFAULT 0 CHECK (ArrivalLateMinutes >= 0),
+    DepartureLateMinutes INT DEFAULT 0 CHECK (DepartureLateMinutes >= 0),
+    ArrivalOvertimeMinutes INT DEFAULT 0 CHECK (ArrivalOvertimeMinutes >= 0),
+    DepartureOvertimeMinutes INT DEFAULT 0 CHECK (DepartureOvertimeMinutes >= 0),
 	CONSTRAINT UQ_Personel_WorkDate UNIQUE (PersonelID, WorkDate) -- ONE SUMMARY PER DAY
 );
+GO
