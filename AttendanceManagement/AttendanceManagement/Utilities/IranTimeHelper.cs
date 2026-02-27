@@ -29,5 +29,10 @@ namespace AttendanceManagement.Utilities
         {
             return PersianCal.ToDateTime(persianYear, persianMonth, persianDay, 0, 0, 0, 0);
         }
+
+        public static bool IsLeapYear(int persianYear)
+        {
+            return PersianCal.IsLeapYear(persianYear);
+        }
     }
 }

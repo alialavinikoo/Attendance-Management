@@ -7,6 +7,8 @@ namespace AttendanceManagement.Models
         public string RawLine { get; set; }
         public string ErrorReason { get; set; }
 
+        public DateTime CreatedAt { get; set; }
+
         public CorruptedLog(string rawLine, string errorReason)
         {
             // If the string is completely null, make it empty to avoid crashes

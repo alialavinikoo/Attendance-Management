@@ -47,7 +47,7 @@
             pnlSidebar.Dock = DockStyle.Left;
             pnlSidebar.Location = new Point(0, 0);
             pnlSidebar.Name = "pnlSidebar";
-            pnlSidebar.Size = new Size(225, 489);
+            pnlSidebar.Size = new Size(225, 612);
             pnlSidebar.TabIndex = 0;
             // 
             // btnCalendar
@@ -99,14 +99,14 @@
             pnlMainContent.Dock = DockStyle.Fill;
             pnlMainContent.Location = new Point(225, 0);
             pnlMainContent.Name = "pnlMainContent";
-            pnlMainContent.Size = new Size(675, 489);
+            pnlMainContent.Size = new Size(921, 612);
             pnlMainContent.TabIndex = 0;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(9F, 23F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(900, 489);
+            ClientSize = new Size(1146, 612);
             Controls.Add(pnlMainContent);
             Controls.Add(pnlSidebar);
             Font = new Font("Segoe UI", 10F);
