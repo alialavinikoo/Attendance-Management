@@ -26,7 +26,6 @@ namespace AttendanceManagement.Models
             get { return _startTime; }
             set
             {
-                // If FinishTime is already set, ensure StartTime isn't accidentally pushed past it
                 if (_finishTime != TimeSpan.Zero && value >= _finishTime)
                     throw new ArgumentException("زمان شروع باید قبل از زمان پایان باشد.");
 
@@ -40,7 +39,6 @@ namespace AttendanceManagement.Models
             get { return _finishTime; }
             set
             {
-                // Ensure FinishTime is strictly after StartTime (Since no night shifts allowed)
                 if (_startTime != TimeSpan.Zero && value <= _startTime)
                     throw new ArgumentException("زمان پایان باید بعد از زمان شروع باشد.");
 

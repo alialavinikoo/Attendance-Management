@@ -12,7 +12,6 @@ namespace AttendanceManagement.Forms
         private TextBox txtShiftName;
         private Button btnSave;
 
-        // Arrays to hold our dynamic row controls so we can read them later
         private CheckBox[] chkDays = new CheckBox[7];
         private DateTimePicker[] dtpStart = new DateTimePicker[7];
         private DateTimePicker[] dtpEnd = new DateTimePicker[7];
@@ -97,7 +96,7 @@ namespace AttendanceManagement.Forms
             this.Controls.Add(btnSave);
         }
 
-        private void BtnSave_Click(object sender, EventArgs e)
+        private async void BtnSave_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtShiftName.Text))
             {
@@ -110,13 +109,11 @@ namespace AttendanceManagement.Forms
 
             try
             {
-                // Create the Parent Object
                 Shift newShift = new Shift
                 {
                     ShiftName = txtShiftName.Text.Trim()
                 };
 
-                // harvest the Children
                 bool hasAtLeastOneDay = false;
                 for (int i = 0; i < 7; i++)
                 {
@@ -142,7 +139,7 @@ namespace AttendanceManagement.Forms
 
                 // 3. Send the entire package to the Database Engine!
                 ShiftRepo repo = new ShiftRepo();
-                repo.AddShift(newShift);
+                await repo.AddShiftAsync(newShift);
 
                 this.DialogResult = DialogResult.OK;
                 this.Close();

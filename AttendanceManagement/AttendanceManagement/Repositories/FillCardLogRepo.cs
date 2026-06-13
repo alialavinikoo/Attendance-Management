@@ -1,31 +1,34 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
 using Microsoft.Data.SqlClient;
 
 namespace AttendanceManagement.Repositories
 {
     public class FillCardLogRepo
     {
-        public void BulkInsertStaging(DataTable validTable, SqlTransaction transaction)
+        public async Task BulkInsertStaging(DataTable validTable, SqlTransaction transaction)
         {
-            if (validTable == null) throw new ArgumentNullException(nameof(validTable));
+            if (validTable == null)
+                throw new ArgumentNullException(nameof(validTable));
 
-            if (validTable.Rows.Count > 0)
-            {
-                using (SqlBulkCopy bulkStaging = new SqlBulkCopy(transaction.Connection, SqlBulkCopyOptions.Default, transaction))
-                {
-                    bulkStaging.DestinationTableName = "CardLogs_Staging";
+            if (validTable.Rows.Count == 0)
+                return;
 
-                    bulkStaging.ColumnMappings.Add("PersonelID", "PersonelID");
-                    bulkStaging.ColumnMappings.Add("CardDate", "CardDate");
-                    bulkStaging.ColumnMappings.Add("CardTime", "CardTime");
-                    bulkStaging.ColumnMappings.Add("CardStatus", "CardStatus");
-                    bulkStaging.ColumnMappings.Add("GateNumber", "GateNumber");
+            using SqlBulkCopy bulk = new SqlBulkCopy(
+                transaction.Connection,
+                SqlBulkCopyOptions.Default,
+                transaction);
 
-                    bulkStaging.WriteToServer(validTable);
-                }
-            }
+            bulk.DestinationTableName = "CardLogs_Staging";
+
+            bulk.ColumnMappings.Add("PersonelID", "PersonelID");
+            bulk.ColumnMappings.Add("CardDate", "CardDate");
+            bulk.ColumnMappings.Add("CardTime", "CardTime");
+            bulk.ColumnMappings.Add("CardStatus", "CardStatus");
+            bulk.ColumnMappings.Add("GateNumber", "GateNumber");
+
+            await bulk.WriteToServerAsync(validTable);
         }
+
     }
 }

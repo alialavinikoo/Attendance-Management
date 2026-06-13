@@ -17,9 +17,12 @@ namespace AttendanceManagement.Forms
         {
             InitializeComponent();
             SetupUI();
+            this.Load += FrmAddPersonel_Load;
+        }
 
-            // NEW: Fetch real data right after building the UI
-            LoadShiftsIntoDropdown();
+        private async void FrmAddPersonel_Load(object sender, EventArgs e)
+        {
+            await LoadShiftsIntoDropdown();
         }
 
         private void SetupUI()
@@ -77,31 +80,26 @@ namespace AttendanceManagement.Forms
             return txt;
         }
 
-        // ==========================================
-        // NEW: Database Binding Method
-        // ==========================================
-        private void LoadShiftsIntoDropdown()
+        // Database Binding Method
+        private async Task LoadShiftsIntoDropdown()
         {
             try
             {
                 ShiftRepo shiftRepo = new ShiftRepo();
-                List<Shift> realShifts = shiftRepo.GetAllShiftNames();
+                List<Shift> realShifts = await shiftRepo.GetAllShiftNamesAsync();
 
                 if (realShifts.Count > 0)
                 {
-                    // Bind the list to the ComboBox
                     cmbShift.DataSource = realShifts;
 
-                    // What the user actually sees on screen
                     cmbShift.DisplayMember = "ShiftName";
 
-                    // The hidden SQL Database ID attached to that choice
                     cmbShift.ValueMember = "ShiftID";
                 }
                 else
                 {
                     MessageBox.Show("هیچ شیفتی در سیستم تعریف نشده است! لطفا ابتدا یک شیفت بسازید.", "هشدار", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    btnSave.Enabled = false; // Prevent saving if there are no shifts to assign!
+                    btnSave.Enabled = false; 
                 }
             }
             catch (Exception ex)
@@ -110,7 +108,7 @@ namespace AttendanceManagement.Forms
             }
         }
 
-        private void BtnSave_Click(object sender, EventArgs e)
+        private async void BtnSave_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtFirstName.Text) || string.IsNullOrWhiteSpace(txtLastName.Text))
             {
@@ -136,7 +134,7 @@ namespace AttendanceManagement.Forms
             try
             {
                 PersonelRepo repo = new PersonelRepo();
-                repo.AddPersonel(newPerson);
+                await repo.AddPersonelAsync(newPerson);
 
                 this.DialogResult = DialogResult.OK;
                 this.Close();

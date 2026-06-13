@@ -6,22 +6,22 @@ namespace AttendanceManagement.Repositories
 {
     public class FillCorruptedRepo
     {
-        public void BulkInsertCorrupted(DataTable corruptedTable, SqlTransaction transaction)
+        public async Task BulkInsertCorrupted(DataTable corruptedTable, SqlTransaction transaction)
         {
-            if (corruptedTable == null) throw new ArgumentNullException(nameof(corruptedTable));
+            if (corruptedTable == null)
+                throw new ArgumentNullException(nameof(corruptedTable));
 
-            if (corruptedTable.Rows.Count > 0)
-            {
-                using (SqlBulkCopy bulkCorrupted = new SqlBulkCopy(transaction.Connection, SqlBulkCopyOptions.Default, transaction))
-                {
-                    bulkCorrupted.DestinationTableName = "CorruptedLogs";
+            if (corruptedTable.Rows.Count == 0)
+                return;
 
-                    bulkCorrupted.ColumnMappings.Add("RawLine", "RawLine");
-                    bulkCorrupted.ColumnMappings.Add("ErrorReason", "ErrorReason");
+            using SqlBulkCopy bulk = new SqlBulkCopy(transaction.Connection, SqlBulkCopyOptions.Default, transaction);
 
-                    bulkCorrupted.WriteToServer(corruptedTable);
-                }
-            }
+            bulk.DestinationTableName = "CorruptedLogs";
+
+            bulk.ColumnMappings.Add("RawLine", "RawLine");
+            bulk.ColumnMappings.Add("ErrorReason", "ErrorReason");
+
+            await bulk.WriteToServerAsync(corruptedTable);
         }
     }
 }

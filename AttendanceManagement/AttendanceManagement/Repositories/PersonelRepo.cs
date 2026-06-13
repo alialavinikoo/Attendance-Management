@@ -14,7 +14,7 @@ namespace AttendanceManagement.Repositories
             _connectionString = DatabaseConfig.GetConnectionString();
         }
 
-        public List<Personel> GetAllPersonel()
+        public async Task<List<Personel>> GetAllPersonelAsync()
         {
             List<Personel> personels = new List<Personel>();
 
@@ -38,8 +38,8 @@ namespace AttendanceManagement.Repositories
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        conn.Open();
-                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        await conn.OpenAsync();
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
                             int ordPersonelID = reader.GetOrdinal("PersonelID");
                             int ordFirstName = reader.GetOrdinal("FirstName");
@@ -51,7 +51,7 @@ namespace AttendanceManagement.Repositories
                             int ordShiftID = reader.GetOrdinal("ShiftID");
                             int ordIsActive = reader.GetOrdinal("IsActive");
 
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
                                 Personel p = new Personel();
 
@@ -75,8 +75,6 @@ namespace AttendanceManagement.Repositories
             }
             catch (SqlException ex)
             {
-                // In a real app, you would log this to a file (e.g., NLog, Serilog)
-                // We rethrow a custom exception so the UI knows it failed without exposing DB secrets
                 throw new Exception($"Database error while fetching personnel: {ex.Message}", ex);
             }
             catch (Exception ex)
@@ -87,7 +85,7 @@ namespace AttendanceManagement.Repositories
             return personels;
         }
 
-        public void AddPersonel(Personel p)
+        public async Task AddPersonelAsync(Personel p)
         {
             try
             {
@@ -110,8 +108,8 @@ namespace AttendanceManagement.Repositories
 
                         cmd.Parameters.AddWithValue("@ShiftID", p.ShiftID);
 
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
+                        await conn.OpenAsync();
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
             }

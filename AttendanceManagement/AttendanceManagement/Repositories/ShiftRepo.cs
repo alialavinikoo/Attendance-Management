@@ -16,7 +16,7 @@ namespace AttendanceManagement.Repositories
             _connectionString = DatabaseConfig.GetConnectionString();
         }
 
-        public List<Shift> GetAllShifts()
+        public async Task<List<Shift>> GetAllShiftsAsync()
         {
             List<Shift> shifts = new List<Shift>();
 
@@ -33,9 +33,9 @@ namespace AttendanceManagement.Repositories
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        conn.Open();
+                        await conn.OpenAsync();
 
-                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
                             int ordShiftID = reader.GetOrdinal("ShiftID");
                             int ordShiftName = reader.GetOrdinal("ShiftName");
@@ -46,7 +46,7 @@ namespace AttendanceManagement.Repositories
 
                             Dictionary<int, Shift> shiftDictionary = new Dictionary<int, Shift>();
 
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
                                 int currentShiftID = reader.GetInt32(ordShiftID);
 
@@ -71,11 +71,9 @@ namespace AttendanceManagement.Repositories
                                         StartTime = reader.GetTimeSpan(ordStartTime),
                                         FinishTime = reader.GetTimeSpan(ordFinishTime)
                                     };
-
                                     currentShift.Schedules.Add(schedule);
                                 }
                             }
-
                             shifts.AddRange(shiftDictionary.Values);
                         }
                     }
@@ -93,7 +91,7 @@ namespace AttendanceManagement.Repositories
             return shifts;
         }
 
-        public List<Shift> GetAllShiftNames()
+        public async Task<List<Shift>> GetAllShiftNamesAsync()
         {
             List<Shift> shifts = new List<Shift>();
 
@@ -108,14 +106,14 @@ namespace AttendanceManagement.Repositories
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        conn.Open();
+                        await conn.OpenAsync();
 
-                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
                             int ordShiftID = reader.GetOrdinal("ShiftID");
                             int ordShiftName = reader.GetOrdinal("ShiftName");
 
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
                                 Shift shift = new Shift
                                 {
@@ -141,13 +139,13 @@ namespace AttendanceManagement.Repositories
             return shifts;
         }
 
-        public void AddShift(Shift shift)
+        public async Task AddShiftAsync(Shift shift)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 try
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
 
                     using (SqlTransaction transaction = conn.BeginTransaction())
                     {
@@ -160,7 +158,7 @@ namespace AttendanceManagement.Repositories
                         using (SqlCommand cmdParent = new SqlCommand(shiftQuery, conn, transaction))
                         {
                             cmdParent.Parameters.AddWithValue("@ShiftName", shift.ShiftName);
-                            shift.ShiftID = (int)cmdParent.ExecuteScalar();
+                            shift.ShiftID = (int)(await cmdParent.ExecuteScalarAsync());
                         }
 
                         // INSERT CHILDREN
@@ -184,12 +182,12 @@ namespace AttendanceManagement.Repositories
                                     cmdChild.Parameters["@StartTime"].Value = schedule.StartTime;
                                     cmdChild.Parameters["@FinishTime"].Value = schedule.FinishTime;
 
-                                    cmdChild.ExecuteNonQuery();
+                                    await cmdChild.ExecuteNonQueryAsync();
                                 }
                             }
                         }
 
-                        transaction.Commit();
+                        await transaction.CommitAsync();
                     }
                 }
                 catch (SqlException ex)

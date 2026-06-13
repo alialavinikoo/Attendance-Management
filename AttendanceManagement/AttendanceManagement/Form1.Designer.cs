@@ -29,7 +29,8 @@
         private void InitializeComponent()
         {
             pnlSidebar = new Panel();
-            btnCalendar = new Button();
+            btnAttendanceReport = new Button();
+            btnDashboard = new Button();
             btnShifts = new Button();
             btnPersonnel = new Button();
             btnAttendance = new Button();
@@ -40,29 +41,37 @@
             // pnlSidebar
             // 
             pnlSidebar.BackColor = SystemColors.ControlDarkDark;
-            pnlSidebar.Controls.Add(btnCalendar);
             pnlSidebar.Controls.Add(btnShifts);
             pnlSidebar.Controls.Add(btnPersonnel);
             pnlSidebar.Controls.Add(btnAttendance);
+            pnlSidebar.Controls.Add(btnAttendanceReport);
+            pnlSidebar.Controls.Add(btnDashboard);
             pnlSidebar.Dock = DockStyle.Left;
             pnlSidebar.Location = new Point(0, 0);
             pnlSidebar.Name = "pnlSidebar";
             pnlSidebar.Size = new Size(225, 612);
             pnlSidebar.TabIndex = 0;
             // 
-            // btnCalendar
+            // btnAttendanceReport
             // 
-            btnCalendar.Dock = DockStyle.Top;
-            btnCalendar.FlatStyle = FlatStyle.Flat;
-            btnCalendar.Location = new Point(0, 174);
-            btnCalendar.Name = "btnCalendar";
-            btnCalendar.Size = new Size(225, 58);
-            btnCalendar.TabIndex = 3;
-            btnCalendar.Text = "Calendar";
-            btnCalendar.UseVisualStyleBackColor = true;
-            // 
+            btnAttendanceReport.Dock = DockStyle.Top;
+            btnAttendanceReport.FlatStyle = FlatStyle.Flat;
+            btnAttendanceReport.Location = new Point(0, 174);
+            btnAttendanceReport.Name = "btnAttendanceReport";
+            btnAttendanceReport.Size = new Size(225, 58);
+            btnAttendanceReport.TabIndex = 3;
+            btnAttendanceReport.Text = "Calendar";
+            btnAttendanceReport.UseVisualStyleBackColor = true;
+            // btnDashboard
+            btnDashboard.Dock = DockStyle.Top;
+            btnDashboard.FlatStyle = FlatStyle.Flat;
+            btnDashboard.Location = new Point(0, 0);
+            btnDashboard.Name = "btnDashboard";
+            btnDashboard.Size = new Size(225, 58);
+            btnDashboard.TabIndex = 0;
+            btnDashboard.Text = "Home";
+            btnDashboard.UseVisualStyleBackColor = true;
             // btnShifts
-            // 
             btnShifts.Dock = DockStyle.Top;
             btnShifts.FlatStyle = FlatStyle.Flat;
             btnShifts.Location = new Point(0, 116);
@@ -122,7 +131,8 @@
         #endregion
 
         private Panel pnlSidebar;
-        private Button btnCalendar;
+        private Button btnAttendanceReport;
+        private Button btnDashboard;
         private Button btnShifts;
         private Button btnPersonnel;
         private Button btnAttendance;

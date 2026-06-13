@@ -8,7 +8,7 @@
         public TimeSpan CardTime {  get; set; }
         public byte CardStatus {  get; set; }
         public byte GateNumber {  get; set; }
+        
         public CardLog() { }
-
     }
 }

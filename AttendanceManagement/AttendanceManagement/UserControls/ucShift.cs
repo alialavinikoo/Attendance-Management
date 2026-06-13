@@ -26,6 +26,13 @@ namespace AttendanceManagement.UserControls
         {
             InitializeComponent();
             SetupLayout();
+
+            this.Load += ucShift_Load;
+        }
+
+        private async void ucShift_Load(object sender, EventArgs e)
+        {
+            await LoadDataAsync();
         }
 
         private void SetupLayout()
@@ -115,26 +122,25 @@ namespace AttendanceManagement.UserControls
             dgv.BringToFront();
 
             btnAdd.Click += BtnAdd_Click;
-            LoadData();
         }
 
-        private void BtnAdd_Click(object sender, EventArgs e)
+        private async void BtnAdd_Click(object sender, EventArgs e)
         {
             using (FrmAddShift addForm = new FrmAddShift())
             {
                 if (addForm.ShowDialog() == DialogResult.OK)
                 {
-                    LoadData();
+                    await LoadDataAsync();
                 }
             }
         }
 
-        private void LoadData()
+        private async Task LoadDataAsync()
         {
             try
             {
                 ShiftRepo repo = new ShiftRepo();
-                var realData = repo.GetAllShifts();
+                var realData = await repo.GetAllShiftsAsync();
 
                 var displayData = realData.Select(s => new
                 {

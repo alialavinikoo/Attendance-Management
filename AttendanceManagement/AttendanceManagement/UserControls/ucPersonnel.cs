@@ -25,6 +25,13 @@ namespace AttendanceManagement.UserControls
         {
             InitializeComponent();
             SetupLayout();
+
+            this.Load += ucPersonel_Load;
+        }
+
+        private async void ucPersonel_Load(object sender, EventArgs e)
+        {
+            await LoadDataAsync();
         }
 
         private void SetupLayout()
@@ -109,26 +116,25 @@ namespace AttendanceManagement.UserControls
             dgv.BringToFront();
 
             btnAdd.Click += BtnAdd_Click;
-            LoadData();
         }
 
-        private void BtnAdd_Click(object sender, EventArgs e)
+        private async void BtnAdd_Click(object sender, EventArgs e)
         {
             using (FrmAddPersonel addForm = new FrmAddPersonel())
             {
                 if (addForm.ShowDialog() == DialogResult.OK)
                 {
-                    LoadData();
+                    await LoadDataAsync();
                 }
             }
         }
 
-        private void LoadData()
+        private async Task LoadDataAsync()
         {
             try
             {
                 PersonelRepo repo = new PersonelRepo();
-                var data = repo.GetAllPersonel();
+                var data = await repo.GetAllPersonelAsync();
 
                 dgv.DataSource = data;
             }

@@ -30,6 +30,16 @@ namespace AttendanceManagement.Utilities
             return PersianCal.ToDateTime(persianYear, persianMonth, persianDay, 0, 0, 0, 0);
         }
 
+        public static int GetDaysInMonth(int year, int month) 
+        {
+            return (month <= 6) ? 31 : (month < 12) ? 30 : (IranTimeHelper.IsLeapYear(year) ? 30 : 29);
+        }
+
+        public static int GetCurrentPersianYear()
+        {
+            return PersianCal.GetYear(DateTime.Today);
+        }
+
         public static bool IsLeapYear(int persianYear)
         {
             return PersianCal.IsLeapYear(persianYear);

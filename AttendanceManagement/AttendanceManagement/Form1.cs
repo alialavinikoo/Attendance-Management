@@ -22,9 +22,13 @@ namespace AttendanceManagement
             InitializeComponent();
             ApplyModernStyles();
             ApplyPersianLocalization();
+            this.WindowState = FormWindowState.Maximized;
         }
 
-        private void Form1_Load(object sender, EventArgs e) { }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            btnDashboard_Click(btnDashboard, EventArgs.Empty);
+        }
 
         private void ApplyPersianLocalization()
         {
@@ -35,10 +39,11 @@ namespace AttendanceManagement
 
             this.Text = "سیستم مدیریت حضور و غیاب";
 
-            if (btnAttendance != null) btnAttendance.Text = "حضور و غیاب";
+            if (btnAttendance != null) btnAttendance.Text = "کارت های حضور و غیاب";
             if (btnPersonnel != null) btnPersonnel.Text = "پرسنل";
             if (btnShifts != null) btnShifts.Text = "شیفت ها";
-            if (btnCalendar != null) btnCalendar.Text = "تقویم";
+            if (btnAttendanceReport != null) btnAttendanceReport.Text = "گزارش حضور و غیاب";
+            if (btnDashboard != null) btnDashboard.Text = "داشبورد";
         }
 
         private void ApplyModernStyles()
@@ -53,9 +58,12 @@ namespace AttendanceManagement
             pnlSidebar.Controls.Add(pnlNavIndicator);
 
             // Manually link the buttons to the events
+            if (btnDashboard != null) btnDashboard.Click += btnDashboard_Click;
             if (btnAttendance != null) btnAttendance.Click += btnAttendance_Click;
             if (btnPersonnel != null) btnPersonnel.Click += btnPersonnel_Click;
             if (btnShifts != null) btnShifts.Click += btnShifts_Click;
+            if (btnAttendanceReport != null) btnAttendanceReport.Click += btnAttendanceReport_Click;
+            
 
 
             // Loop through every button
@@ -136,6 +144,16 @@ namespace AttendanceManagement
         private void btnShifts_Click(object sender, EventArgs e)
         {
             LoadScreen(new ucShift(), (Button)sender);
+        }
+
+        private void btnAttendanceReport_Click(object sender, EventArgs e)
+        {
+            LoadScreen(new ucAttendanceReport(), (Button)sender);
+        }
+
+        private void btnDashboard_Click(object sender, EventArgs e)
+        {
+            LoadScreen(new ucDashboard(), (Button)sender);
         }
     }
 }

@@ -10,17 +10,17 @@ namespace AttendanceManagement.Repositories
 {
     internal class CorruptedLogsRepo
     {
-        private string _connectionString;
+        private readonly string _connectionString;
 
         public CorruptedLogsRepo()
         {
             _connectionString = DatabaseConfig.GetConnectionString();
         }
 
-        public List<CorruptedLog> GetCorruptedLogs(DateTime? fromDate, DateTime? toDate, string searchString, int pageNumber, int pageSize, out int totalRecords)
+        public async Task<(List<CorruptedLog> CorruptedLogs, int totalRecords)> GetCorruptedLogsAsync(DateTime? fromDate, DateTime? toDate, string searchString, int pageNumber, int pageSize)
         {
             List<CorruptedLog> CorruptedLogs = new List<CorruptedLog>();
-            totalRecords = 0;
+            int totalRecords = 0;
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -37,16 +37,16 @@ namespace AttendanceManagement.Repositories
                     cmd.Parameters.Add(new SqlParameter("@PageSize", SqlDbType.Int) { Value = pageSize });
                     cmd.Parameters.Add(new SqlParameter("@PageNumber", SqlDbType.Int) { Value = pageNumber });
 
-                    conn.Open();
+                    await conn.OpenAsync();
 
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                     {
                         int ordRawLine = reader.GetOrdinal("RawLine");
                         int ordCreatedAt = reader.GetOrdinal("CreatedAt");
                         int ordErrorReason = reader.GetOrdinal("ErrorReason");
                         int ordTotalRecords = reader.GetOrdinal("TotalCount");
 
-                        while (reader.Read())
+                        while (await reader.ReadAsync())
                         {
 
                             if (totalRecords == 0)
@@ -64,7 +64,7 @@ namespace AttendanceManagement.Repositories
                     }
                 }
             }
-            return CorruptedLogs;
+            return (CorruptedLogs, totalRecords);
         }
 
     }

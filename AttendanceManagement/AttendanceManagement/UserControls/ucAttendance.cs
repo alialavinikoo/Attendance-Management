@@ -43,6 +43,8 @@ namespace AttendanceManagement.UserControls
         private Button btnPrevPage;
         private Label lblPageInfo;
 
+        private bool _isLoading = false;
+
         public ucAttendance()
         {
             InitializeComponent();
@@ -51,9 +53,9 @@ namespace AttendanceManagement.UserControls
             this.Load += UcAttendance_Load;
         }
 
-        private void UcAttendance_Load(object sender, EventArgs e)
+        private async void UcAttendance_Load(object sender, EventArgs e)
         {
-            LoadGridData();
+            await LoadGridDataAsync();
         }
 
         private void SetupLayout()
@@ -360,11 +362,11 @@ namespace AttendanceManagement.UserControls
             }
         }
 
-        private void TabMain_SelectedIndexChanged(object sender, EventArgs e)
+        private async void TabMain_SelectedIndexChanged(object sender, EventArgs e)
         {
             currentPage = 1;
 
-            LoadGridData();
+            await LoadGridDataAsync();
         }
 
         private DataGridView CreateStandardGrid()
@@ -448,14 +450,14 @@ namespace AttendanceManagement.UserControls
 
         // Events
 
-        private void BtnAdd_Click(object sender, EventArgs e)
+        private async void BtnAdd_Click(object sender, EventArgs e)
         {
             using (FrmAddCardLog addForm = new FrmAddCardLog())
             {
                 if (addForm.ShowDialog() == DialogResult.OK)
                 {
                     MessageBox.Show("تردد با موفقیت ثبت شد.", "موفق", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LoadGridData(); // Refresh the grid!
+                    await LoadGridDataAsync(); 
                 }
             }
         }
@@ -494,7 +496,7 @@ namespace AttendanceManagement.UserControls
                         MessageBox.Show($"فایل با موفقیت برای سال {persianYear} وارد سیستم شد.", "موفق", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                         currentPage = 1;
-                        LoadGridData();
+                        await LoadGridDataAsync();
                     }
                     catch (Exception ex)
                     {
@@ -509,101 +511,118 @@ namespace AttendanceManagement.UserControls
             }
         }
 
-        private void BtnApplyFilter_Click(object sender, EventArgs e)
+        private async void BtnApplyFilter_Click(object sender, EventArgs e)
         {
             currentPage = 1; 
-            LoadGridData();
-
+            await LoadGridDataAsync();
         }
         
         // The Master Query Method
-        private void LoadGridData()
+        private async Task LoadGridDataAsync()
         {
-            DateTime? startDate = null;
-            DateTime? endDate = null;
+            if (_isLoading == true) 
+                return;
 
-            string mode = cmbFilterMode.SelectedItem.ToString();
-            string search = txtSearch.Text;
+            _isLoading = true;
 
-            try
+            try 
             {
-                if (mode == "امروز")
-                {
-                    startDate = IranTimeHelper.GetCurrentIranTime().Date;
-                    endDate = IranTimeHelper.GetCurrentIranTime().Date;
-                }
-                else if (mode == "روز خاص")
-                {
-                    startDate = IranTimeHelper.PersianToGregorian((int)nudYear.Value, cmbMonth.SelectedIndex + 1, (int)nudDay.Value);
-                    endDate = startDate;
-                }
-                else if (mode == "ماه")
-                {
-                    int selectedMonth = cmbMonth.SelectedIndex + 1;
-                    startDate = IranTimeHelper.PersianToGregorian((int)nudYear.Value, selectedMonth, 1);
+                this.UseWaitCursor = true;
+                Application.DoEvents();
+        
+                DateTime? startDate = null;
+                DateTime? endDate = null;
 
-                    int maxDays = (selectedMonth <= 6) ? 31 : (selectedMonth < 12) ? 30 : (IranTimeHelper.IsLeapYear((int)nudYear.Value) ? 30 : 29);
-                    endDate = IranTimeHelper.PersianToGregorian((int)nudYear.Value, selectedMonth, maxDays);
-                }
-                else if (mode == "سال")
-                {
-                    startDate = IranTimeHelper.PersianToGregorian((int)nudYear.Value, 1, 1);
-                    int lastMonthDays = IranTimeHelper.IsLeapYear((int)nudYear.Value) ? 30 : 29;
-                    endDate = IranTimeHelper.PersianToGregorian((int)nudYear.Value, 12, lastMonthDays);
-                }
+                string mode = cmbFilterMode.SelectedItem.ToString();
+                string search = txtSearch.Text;
 
-                int totalRecords = 0;
-
-                if (tabMain.SelectedTab.Text == "ترددهای معتبر") 
+                try
                 {
-                    CardLogsRepo repo = new CardLogsRepo();
-                    var data = repo.GetCardLogs(startDate, endDate, search, currentPage, pageSize, out totalRecords);
-                    dgvLogs.DataSource = data;
-                }
-                else if (tabMain.SelectedTab.Text == "خطاهای فایل") 
-                {
-                    CorruptedLogsRepo repo = new CorruptedLogsRepo();
-                    var data = repo.GetCorruptedLogs(startDate, endDate, search, currentPage, pageSize, out totalRecords);
-                    dgvCorrupted.DataSource = data;
-                }
+                    if (mode == "امروز")
+                    {
+                        startDate = IranTimeHelper.GetCurrentIranTime().Date;
+                        endDate = IranTimeHelper.GetCurrentIranTime().Date;
+                    }
+                    else if (mode == "روز خاص")
+                    {
+                        startDate = IranTimeHelper.PersianToGregorian((int)nudYear.Value, cmbMonth.SelectedIndex + 1, (int)nudDay.Value);
+                        endDate = startDate;
+                    }
+                    else if (mode == "ماه")
+                    {
+                        int selectedMonth = cmbMonth.SelectedIndex + 1;
+                        startDate = IranTimeHelper.PersianToGregorian((int)nudYear.Value, selectedMonth, 1);
 
-                if (totalRecords == 0)
-                {
-                    totalPages = 1;
-                }
-                else
-                {
-                    totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
-                }
+                        int maxDays = (selectedMonth <= 6) ? 31 : (selectedMonth < 12) ? 30 : (IranTimeHelper.IsLeapYear((int)nudYear.Value) ? 30 : 29);
+                        endDate = IranTimeHelper.PersianToGregorian((int)nudYear.Value, selectedMonth, maxDays);
+                    }
+                    else if (mode == "سال")
+                    {
+                        startDate = IranTimeHelper.PersianToGregorian((int)nudYear.Value, 1, 1);
+                        int lastMonthDays = IranTimeHelper.IsLeapYear((int)nudYear.Value) ? 30 : 29;
+                        endDate = IranTimeHelper.PersianToGregorian((int)nudYear.Value, 12, lastMonthDays);
+                    }
 
-                // Bind to UI
-                lblPageInfo.Text = $"صفحه {currentPage} از {totalPages}";
+                    int totalRecords = 0;
 
-                // Button Toggling
-                btnPrevPage.Enabled = (currentPage > 1);
-                btnNextPage.Enabled = (currentPage < totalPages);
+                    if (tabMain.SelectedTab.Text == "ترددهای معتبر") 
+                    {
+                        CardLogsRepo repo = new CardLogsRepo();
+                        var data = await repo.GetCardLogsAsync(startDate, endDate, search, currentPage, pageSize);
+                        dgvLogs.DataSource = data.cardLogs;
+                        totalRecords = data.totalRecords;
+                    }
+                    else if (tabMain.SelectedTab.Text == "خطاهای فایل") 
+                    {
+                        CorruptedLogsRepo repo = new CorruptedLogsRepo();
+                        var data = await repo.GetCorruptedLogsAsync(startDate, endDate, search, currentPage, pageSize);
+                        dgvCorrupted.DataSource = data.CorruptedLogs;
+                        totalRecords = data.totalRecords;
+                    }
+
+                    if (totalRecords == 0)
+                    {
+                        totalPages = 1;
+                    }
+                    else
+                    {
+                        totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+                    }
+
+                    // Bind to UI
+                    lblPageInfo.Text = $"صفحه {currentPage} از {totalPages}";
+
+                    // Button Toggling
+                    btnPrevPage.Enabled = (currentPage > 1);
+                    btnNextPage.Enabled = (currentPage < totalPages);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("خطا در بارگذاری اطلاعات: " + ex.Message, "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            catch (Exception ex)
+            finally 
             {
-                MessageBox.Show("خطا در بارگذاری اطلاعات: " + ex.Message, "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _isLoading = false;
+                this.UseWaitCursor = false;
             }
         }
 
-        private void BtnNextPage_Click(object sender, EventArgs e)
+        private async void BtnNextPage_Click(object sender, EventArgs e)
         {
             if (currentPage < totalPages)
             {
                 currentPage++;
-                LoadGridData();
+                await LoadGridDataAsync();
             }
         }
 
-        private void BtnPrevPage_Click(object sender, EventArgs e)
+        private async void BtnPrevPage_Click(object sender, EventArgs e)
         {
             if (currentPage > 1)
             {
                 currentPage--;
-                LoadGridData();
+                await LoadGridDataAsync();
             }
         }
 

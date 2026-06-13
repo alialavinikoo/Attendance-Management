@@ -17,10 +17,10 @@ namespace AttendanceManagement.Repositories
             _connectionString = DatabaseConfig.GetConnectionString();
         }
 
-        public List<CardLog> GetCardLogs(DateTime? fromDate, DateTime? toDate, string searchString, int pageNumber, int pageSize, out int totalRecords)
+        public async Task<(List<CardLog> cardLogs, int totalRecords)> GetCardLogsAsync(DateTime? fromDate, DateTime? toDate, string searchString, int pageNumber, int pageSize)
         {
             List<CardLog> cardLogs = new List<CardLog>();
-            totalRecords = 0;
+            int totalRecords = 0;
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -37,9 +37,9 @@ namespace AttendanceManagement.Repositories
                     cmd.Parameters.Add(new SqlParameter("@PageSize", SqlDbType.Int) { Value = pageSize });
                     cmd.Parameters.Add(new SqlParameter("@PageNumber", SqlDbType.Int) { Value = pageNumber });
 
-                    conn.Open();
+                    await conn.OpenAsync();
 
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                     {
                         int ordLogID = reader.GetOrdinal("LogID");
                         int ordPersonelID = reader.GetOrdinal("PersonelID");
@@ -49,7 +49,7 @@ namespace AttendanceManagement.Repositories
                         int ordGateNumber = reader.GetOrdinal("GateNumber");
                         int ordTotalRecords = reader.GetOrdinal("TotalCount");
 
-                        while (reader.Read())
+                        while (await reader.ReadAsync())
                         {
 
                             if (totalRecords == 0)
@@ -72,10 +72,10 @@ namespace AttendanceManagement.Repositories
                     }
                 }
             }
-            return cardLogs;
+            return (cardLogs, totalRecords);
         }
 
-        public void AddCardLog(CardLog cardLog)
+        public async Task AddCardLogAsync(CardLog cardLog)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -91,8 +91,8 @@ namespace AttendanceManagement.Repositories
                     cmd.Parameters.Add(new SqlParameter("@CardStatus", SqlDbType.TinyInt) { Value = cardLog.CardStatus });
                     cmd.Parameters.Add(new SqlParameter("@GateNumber", SqlDbType.TinyInt) { Value = cardLog.GateNumber });
 
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
+                    await conn.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
                 }
             }
         }
